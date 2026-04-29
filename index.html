@@ -226,7 +226,23 @@ function renderTable(rows) {
 
     row.forEach(cell => {
       const el = document.createElement(i === 0 ? "th" : "td");
-      el.textContent = cell || "";
+
+      const value = cell || "";
+
+      // 🔥 detect URL and convert to clickable link
+      if (typeof value === "string" && value.startsWith("http")) {
+        const a = document.createElement("a");
+        a.href = value;
+        a.textContent = value;
+        a.target = "_blank";
+        a.style.color = "#2f80ed";
+        a.style.textDecoration = "underline";
+
+        el.appendChild(a);
+      } else {
+        el.textContent = value;
+      }
+
       tr.appendChild(el);
     });
 
