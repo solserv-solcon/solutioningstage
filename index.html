@@ -7,79 +7,144 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+<!-- Google Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
   margin: 0;
-  background: #f4f6fb;
-  color: #333;
+  font-family: "Inter", sans-serif;
+  background: linear-gradient(135deg, #eef2f7, #f7f9fc);
+  color: #1f2937;
 }
 
+/* Header */
 header {
-  background: #2f80ed;
+  padding: 24px 32px;
+  background: rgba(47, 128, 237, 0.95);
   color: white;
-  padding: 20px;
+  backdrop-filter: blur(10px);
 }
 
+header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* Layout */
 .container {
-  padding: 20px;
+  padding: 24px 32px;
+  max-width: 1200px;
+  margin: auto;
 }
 
+/* KPI Cards */
 .kpis {
-  display: flex;
-  gap: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
   margin-bottom: 20px;
 }
 
 .card {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  flex: 1;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
 }
 
 .card h3 {
   margin: 0;
-  font-size: 14px;
-  color: #777;
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .card p {
+  margin: 8px 0 0;
   font-size: 22px;
-  margin: 5px 0 0;
-  font-weight: bold;
+  font-weight: 700;
 }
 
+/* Chart */
+.chart-box {
+  background: rgba(255,255,255,0.85);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+/* Table */
 .table-container {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  margin-top: 20px;
+  background: rgba(255,255,255,0.85);
+  border-radius: 16px;
+  padding: 16px;
   overflow-x: auto;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-}
-
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  text-align: left;
   font-size: 14px;
 }
 
-th {
-  background: #f0f4ff;
+th, td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
 }
 
-canvas {
-  background: white;
-  padding: 10px;
-  border-radius: 12px;
-  margin-top: 20px;
+th {
+  background: #f3f6ff;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #374151;
+}
+
+tr:hover td {
+  background: #f9fbff;
+}
+
+/* Last updated */
+.meta {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  header {
+    padding: 18px;
+  }
+
+  .container {
+    padding: 16px;
+  }
 }
 </style>
 </head>
@@ -88,31 +153,41 @@ canvas {
 
 <header>
   <h2>📊 Live Google Sheets Dashboard</h2>
+  <p>Auto-syncing data from spreadsheet</p>
 </header>
 
 <div class="container">
 
+  <!-- KPIs -->
   <div class="kpis">
     <div class="card">
       <h3>Total Rows</h3>
       <p id="totalRows">0</p>
     </div>
+
     <div class="card">
       <h3>Last Updated</h3>
       <p id="lastUpdated">-</p>
     </div>
   </div>
 
-  <canvas id="chart"></canvas>
+  <!-- Chart -->
+  <div class="chart-box">
+    <canvas id="chart"></canvas>
+  </div>
 
+  <!-- Table -->
   <div class="table-container">
     <table id="table"></table>
+  </div>
+
+  <div class="meta">
+    Refreshes every 60 seconds
   </div>
 
 </div>
 
 <script>
-/* ✅ FIXED GOOGLE SHEETS CSV LINK */
 const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsvFbwvg5SnFVAoRenv1dvGayWXKZq-RJ2fuhPCofX6ro2MC-BLIwL1_rZ3az9iwSkKtl9_aSSak9g/pub?gid=488974230&single=true&output=csv";
 
 let chart;
@@ -135,7 +210,7 @@ async function loadData() {
       new Date().toLocaleString();
 
   } catch (err) {
-    console.error("Error loading data:", err);
+    console.error(err);
   }
 }
 
@@ -174,8 +249,15 @@ function renderChart(rows) {
       labels,
       datasets: [{
         label: rows[0][1] || "Value",
-        data: values
+        data: values,
+        backgroundColor: "#2f80ed"
       }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      }
     }
   });
 }
