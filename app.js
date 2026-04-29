@@ -1,4 +1,4 @@
-const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsvFbwvg5SnFVAoRenv1dvGayWXKZq-RJ2fuhPCofX6ro2MC-BLIwL1_rZ3az9iwSkKtl9_aSSak9g/pubhtml";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsvFbwvg5SnFVAoRenv1dvGayWXKZq-RJ2fuhPCofX6ro2MC-BLIwL1_rZ3az9iwSkKtl9_aSSak9g/pub?gid=488974230&single=true&output=csv";
 
 let rawRows = [];
 let chartInstance = null;
