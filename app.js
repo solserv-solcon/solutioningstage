@@ -4,37 +4,40 @@ let rawRows = [];
 let chartInstance = null;
 
 async function loadData() {
-const res = await fetch(CSV_URL);
-const text = await res.text();
+  const res = await fetch(CSV_URL);
+  const text = await res.text();
 
-rawRows = text.trim().split("\n").map(r => r.split(","));
+  const rows = text
+    .split("\n")
+    .map(r => r.trim())
+    .filter(r => r !== "")
+    .map(r => r.split(","));
 
-renderTable(rawRows);
-renderKPIs(rawRows);
-renderChart(rawRows);
+  renderTable(rows);
+  renderKPIs(rows);
+  renderChart(rows);
 
-document.getElementById("lastUpdated").textContent =
-new Date().toLocaleString();
+  document.getElementById("lastUpdated").textContent =
+    new Date().toLocaleString();
 }
 
 function renderTable(rows) {
-const table = document.getElementById("data-table");
-table.innerHTML = "";
+  const table = document.getElementById("data-table");
+  table.innerHTML = "";
 
-rows.forEach((row, i) => {
-const tr = document.createElement("tr");
+  rows.forEach((row, i) => {
+    if (!row || !Array.isArray(row)) return;
 
-```
-row.forEach(cell => {
-  const el = document.createElement(i === 0 ? "th" : "td");
-  el.textContent = cell;
-  tr.appendChild(el);
-});
+    const tr = document.createElement("tr");
 
-table.appendChild(tr);
-```
+    row.forEach(cell => {
+      const td = document.createElement(i === 0 ? "th" : "td");
+      td.textContent = cell ?? "";
+      tr.appendChild(td);
+    });
 
-});
+    table.appendChild(tr);
+  });
 }
 
 function renderKPIs(rows) {
